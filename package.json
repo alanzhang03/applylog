@@ -3,14 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "shared",
+    "extension"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "dev": "npm run dev -w @autotrack/extension",
+    "build": "npm run build -w @autotrack/extension"
   },
   "devDependencies": {
-    "@crxjs/vite-plugin": "^2.7.0",
-    "typescript": "~6.0.2",
-    "vite": "^8.1.0"
+    "typescript": "~6.0.2"
   }
 }
