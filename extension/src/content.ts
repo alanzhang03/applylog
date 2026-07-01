@@ -115,6 +115,6 @@ if (provider && isJobPostingUrl(location.href)) {
       job.description = await ashbyDescriptionViaTabSwitch();
     }
 
-    console.log('[AutoTrack] scraped job', job);
+    chrome.runtime.sendMessage(job);
   })();
 }
