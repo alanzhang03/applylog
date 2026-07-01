@@ -1,0 +1,157 @@
+$zinc-50: #fafafa;
+$zinc-100: #f4f4f5;
+$zinc-200: #e4e4e7;
+$zinc-400: #a1a1aa;
+$zinc-600: #52525b;
+$zinc-900: #18181b;
+
+.page {
+  min-height: 100vh;
+  background: $zinc-50;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: $zinc-900;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: $zinc-400;
+  margin-top: 4px;
+}
+
+.empty {
+  border: 1px solid $zinc-200;
+  border-radius: 12px;
+  background: white;
+  padding: 64px 24px;
+  text-align: center;
+  color: $zinc-400;
+  font-size: 0.875rem;
+}
+
+.tableWrapper {
+  border: 1px solid $zinc-200;
+  border-radius: 12px;
+  background: white;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.thead tr {
+  border-bottom: 1px solid $zinc-100;
+  background: $zinc-50;
+}
+
+.th {
+  text-align: left;
+  padding: 12px 20px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: $zinc-400;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.tbody tr {
+  border-bottom: 1px solid $zinc-100;
+  transition: background 0.1s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: $zinc-50;
+  }
+}
+
+.td {
+  padding: 16px 20px;
+  color: $zinc-600;
+}
+
+.tdCompany {
+  @extend .td;
+  font-weight: 500;
+  color: $zinc-900;
+  white-space: nowrap;
+}
+
+.tdRole {
+  @extend .td;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tdDate {
+  @extend .td;
+  color: $zinc-400;
+  white-space: nowrap;
+}
+
+.tdLink {
+  @extend .td;
+  text-align: right;
+
+  a {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: $zinc-400;
+    text-decoration: none;
+    transition: color 0.1s;
+
+    &:hover {
+      color: $zinc-900;
+    }
+  }
+}
+
+.badge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: capitalize;
+  display: inline-block;
+
+  &.greenhouse {
+    background: #d1fae5;
+    color: #047857;
+  }
+
+  &.lever {
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+
+  &.ashby {
+    background: #ede9fe;
+    color: #6d28d9;
+  }
+
+  &.default {
+    background: $zinc-100;
+    color: $zinc-600;
+  }
+}
