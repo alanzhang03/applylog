@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase-server';
 import StatusSelect from './components/StatusSelect';
 import LogoutButton from './components/LogoutButton';
+import GmailSync from './components/GmailSync';
 import styles from './page.module.scss';
 
 type Job = {
@@ -15,7 +16,9 @@ type Job = {
 
 export default async function Home() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const { data: jobs, error } = await supabase
     .from('jobs')
@@ -27,7 +30,9 @@ export default async function Home() {
     return (
       <div className={styles.page}>
         <div className={styles.container}>
-          <p style={{ color: '#ef4444', fontSize: '0.875rem' }}>Failed to load: {error.message}</p>
+          <p style={{ color: '#ef4444', fontSize: '0.875rem' }}>
+            Failed to load: {error.message}
+          </p>
         </div>
       </div>
     );
@@ -35,6 +40,7 @@ export default async function Home() {
 
   return (
     <div className={styles.page}>
+      <GmailSync />
       <div className={styles.container}>
         <div className={styles.header}>
           <div>
@@ -70,17 +76,27 @@ export default async function Home() {
                       <StatusSelect id={job.id} status={job.status} />
                     </td>
                     <td className={styles.td}>
-                      <span className={`${styles.badge} ${styles[job.provider] ?? styles.default}`}>
+                      <span
+                        className={`${styles.badge} ${styles[job.provider] ?? styles.default}`}
+                      >
                         {job.provider}
                       </span>
                     </td>
                     <td className={styles.tdDate}>
                       {new Date(job.scraped_at).toLocaleDateString('en-US', {
-                        month: 'short', day: 'numeric', year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
                       })}
                     </td>
                     <td className={styles.tdLink}>
-                      <a href={job.url} target="_blank" rel="noopener noreferrer">View →</a>
+                      <a
+                        href={job.url}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                      >
+                        View →
+                      </a>
                     </td>
                   </tr>
                 ))}
