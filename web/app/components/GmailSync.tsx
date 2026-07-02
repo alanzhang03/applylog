@@ -30,7 +30,22 @@ export default function GmailSync() {
         { headers: { Authorization: `Bearer ${token}` } },
       );
       const listData = await listRes.json();
-      console.log(listData);
+      const messages = listData.messages ?? [];
+      let messages_wanted: { id: string; subject: string }[] = [];
+
+      for (const msg of messages) {
+        const res = await fetch(
+          `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata&metadataHeaders=Subject`,
+          { headers: { Authorization: `Bearer ${token}` } },
+        );
+        const msgData = await res.json();
+        const subject = msgData.payload.headers.find(
+          (h: { name: string; value: string }) => h.name === 'Subject',
+        )?.value;
+        if (subject) messages_wanted.push({ id: msg.id, subject });
+      }
+      console.log(messages);
+      console.log(messages_wanted);
     }
     sync();
   }, []);
