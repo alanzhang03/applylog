@@ -3,13 +3,17 @@
   "name": "AutoTrack",
   "version": "0.0.1",
   "description": "Automatically track job applications from ATS sites.",
-  "permissions": ["tabs"],
+  "permissions": ["tabs", "identity", "storage"],
   "host_permissions": [
     "*://*.greenhouse.io/*",
     "*://*.lever.co/*",
     "*://*.ashbyhq.com/*",
     "https://*.supabase.co/*"
   ],
+  "action": {
+    "default_popup": "src/popup.html",
+    "default_title": "AutoTrack"
+  },
   "background": {
     "service_worker": "src/background.ts",
     "type": "module"
