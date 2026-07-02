@@ -1,0 +1,14 @@
+.select {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  appearance: none;
+
+  &:focus {
+    outline: 2px solid #a1a1aa;
+    outline-offset: 2px;
+  }
+}
