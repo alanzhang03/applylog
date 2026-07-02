@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
@@ -22,8 +22,6 @@ function extractCompany(subject: string): string | null {
 
 export default function GmailSync() {
   const router = useRouter();
-  const [isRunning, setIsRunning] = useState(false);
-
   useEffect(() => {
     async function sync() {
       const last_synced_at = localStorage.getItem('last_synced_at');
@@ -61,9 +59,6 @@ export default function GmailSync() {
         )?.value;
         if (subject) messages_wanted.push({ id: msg.id, subject });
       }
-      console.log(messages);
-      console.log(messages_wanted);
-
       const companies = [
         ...new Set(
           messages_wanted
@@ -71,15 +66,11 @@ export default function GmailSync() {
             .filter(Boolean) as string[],
         ),
       ];
-      console.log(companies);
-
       const { data: matchedJobs, error } = await supabase
         .from('jobs')
         .select('id, company')
         .eq('user_id', session?.user.id)
         .in('company', companies);
-      console.log(matchedJobs);
-
       if (matchedJobs && matchedJobs.length > 0) {
         const ids = matchedJobs.map((j) => j.id);
         await supabase.from('jobs').update({ status: 'applied' }).in('id', ids);
