@@ -3,6 +3,23 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
+function extractCompany(subject: string): string | null {
+  const patterns = [
+    /applying to ([^!,\.]+)/i,
+    /application to ([^!,\.]+)/i,
+    /applying at ([^!,\.]+)/i,
+    /applied at ([^!,\.]+)/i,
+    /sent to ([^!,\.]+)/i,
+    /viewed by ([^!,\.]+)/i,
+    /^([^–\-]+)\s*[–\-]/,
+  ];
+  for (const pattern of patterns) {
+    const match = subject.match(pattern);
+    if (match) return match[1].trim();
+  }
+  return null;
+}
+
 export default function GmailSync() {
   const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
@@ -46,7 +63,34 @@ export default function GmailSync() {
       }
       console.log(messages);
       console.log(messages_wanted);
+
+      const companies = [
+        ...new Set(
+          messages_wanted
+            .map((m) => extractCompany(m.subject))
+            .filter(Boolean) as string[],
+        ),
+      ];
+      console.log(companies);
+
+      const { data: matchedJobs, error } = await supabase
+        .from('jobs')
+        .select('id, company')
+        .eq('user_id', session?.user.id)
+        .in('company', companies);
+      console.log(matchedJobs);
+
+      if (matchedJobs && matchedJobs.length > 0) {
+        const ids = matchedJobs.map((j) => j.id);
+        await supabase.from('jobs').update({ status: 'applied' }).in('id', ids);
+        router.refresh();
+      }
+      localStorage.setItem(
+        'last_synced_at',
+        new Date().toISOString().slice(0, 10).replace(/-/g, '/'),
+      );
     }
+
     sync();
   }, []);
 
