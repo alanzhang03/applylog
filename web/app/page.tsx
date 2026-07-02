@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase-server';
 import StatusSelect from './components/StatusSelect';
+import LogoutButton from './components/LogoutButton';
 import styles from './page.module.scss';
 
 type Job = {
@@ -36,8 +37,11 @@ export default async function Home() {
     <div className={styles.page}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Job Tracker</h1>
-          <p className={styles.subtitle}>{jobs?.length ?? 0} jobs saved</p>
+          <div>
+            <h1 className={styles.title}>Job Tracker</h1>
+            <p className={styles.subtitle}>{jobs?.length ?? 0} jobs saved</p>
+          </div>
+          <LogoutButton />
         </div>
 
         {!jobs?.length ? (
