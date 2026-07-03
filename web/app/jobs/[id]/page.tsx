@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase-server';
 import AppHeader from '@/app/components/AppHeader';
 import StatusSelect from '@/app/components/StatusSelect';
+import DeleteJobButton from '@/app/components/DeleteJobButton';
 import styles from './page.module.scss';
 
 export default async function JobPage({ params }: { params: Promise<{ id: string }> }) {
@@ -45,9 +46,14 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
                 year: 'numeric',
               })}
             </span>
-            <a href={job.url} target="_blank" rel="noopener noreferrer" className={styles.link}>
-              View posting →
-            </a>
+            <div className={styles.infoActions}>
+              <a href={job.url} target="_blank" rel="noopener noreferrer" className={styles.link}>
+                View posting →
+              </a>
+              <DeleteJobButton id={job.id} className={styles.deleteButton} redirectTo="/dashboard">
+                Delete
+              </DeleteJobButton>
+            </div>
           </div>
 
           {job.description && (

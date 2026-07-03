@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import StatusSelect from '@/app/components/StatusSelect';
+import DeleteJobButton from '@/app/components/DeleteJobButton';
 import styles from './page.module.scss';
 
 function stripHtml(html: string): string {
@@ -23,25 +25,37 @@ export type Job = {
 const STATUSES = ['saved', 'applied', 'screen', 'interview', 'offer', 'rejected'] as const;
 
 export default function JobsTable({ jobs }: { jobs: Job[] }) {
+  const router = useRouter();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+
+  const visibleJobs = useMemo(
+    () => jobs.filter((job) => !deletedIds.has(job.id)),
+    [jobs, deletedIds],
+  );
+
+  function handleDeleted(id: string) {
+    setDeletedIds((prev) => new Set(prev).add(id));
+    router.refresh();
+  }
 
   const providers = useMemo(
-    () => [...new Set(jobs.map((job) => job.provider))].sort(),
-    [jobs],
+    () => [...new Set(visibleJobs.map((job) => job.provider))].sort(),
+    [visibleJobs],
   );
 
   const counts = useMemo(() => {
     const map: Record<string, number> = {};
     for (const status of STATUSES) map[status] = 0;
-    for (const job of jobs) map[job.status] = (map[job.status] ?? 0) + 1;
+    for (const job of visibleJobs) map[job.status] = (map[job.status] ?? 0) + 1;
     return map;
-  }, [jobs]);
+  }, [visibleJobs]);
 
   const filteredJobs = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return jobs.filter((job) => {
+    return visibleJobs.filter((job) => {
       if (statusFilter !== 'all' && job.status !== statusFilter) return false;
       if (sourceFilter !== 'all' && job.provider !== sourceFilter) return false;
       if (
@@ -53,9 +67,9 @@ export default function JobsTable({ jobs }: { jobs: Job[] }) {
       }
       return true;
     });
-  }, [jobs, search, statusFilter, sourceFilter]);
+  }, [visibleJobs, search, statusFilter, sourceFilter]);
 
-  if (!jobs.length) {
+  if (!visibleJobs.length) {
     return (
       <div className={styles.onboarding}>
         <h2 className={styles.onboardingTitle}>No jobs yet</h2>
@@ -165,10 +179,19 @@ export default function JobsTable({ jobs }: { jobs: Job[] }) {
                       year: 'numeric',
                     })}
                   </td>
-                  <td className={styles.tdLink}>
-                    <a href={job.url} target="_blank" rel="noopener noreferrer">
-                      View →
-                    </a>
+                  <td className={styles.tdActions}>
+                    <div className={styles.actionsRow}>
+                      <a href={job.url} target="_blank" rel="noopener noreferrer">
+                        View →
+                      </a>
+                      <DeleteJobButton
+                        id={job.id}
+                        className={styles.deleteButton}
+                        onDeleted={() => handleDeleted(job.id)}
+                      >
+                        Delete
+                      </DeleteJobButton>
+                    </div>
                   </td>
                 </tr>
               ))}

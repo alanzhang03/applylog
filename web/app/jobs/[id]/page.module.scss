@@ -91,6 +91,33 @@ $zinc-900: #18181b;
   }
 }
 
+.infoActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.deleteButton {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: $zinc-400;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  transition: color 0.1s;
+
+  &:hover {
+    color: #dc2626;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+}
+
 .description {
   margin-top: 4px;
 }
