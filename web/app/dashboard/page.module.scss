@@ -109,11 +109,14 @@ $zinc-900: #18181b;
   border: 1px solid $zinc-200;
   border-radius: 12px;
   background: white;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
   width: 100%;
+  min-width: 640px;
   border-collapse: collapse;
   font-size: 0.875rem;
 }
@@ -333,6 +336,10 @@ $zinc-900: #18181b;
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
+
+  @media (max-width: 560px) {
+    flex-direction: column;
+  }
 }
 
 .searchInput {
