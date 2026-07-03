@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase-server';
 import StatusSelect from './components/StatusSelect';
 import LogoutButton from './components/LogoutButton';
@@ -73,14 +74,18 @@ export default async function Home() {
               <tbody className={styles.tbody}>
                 {jobs.map((job: Job) => (
                   <tr key={job.id}>
-                    <td className={styles.tdCompany}>{job.company}</td>
+                    <td className={styles.tdCompany}>
+                      <Link href={`/jobs/${job.id}`} className={styles.rowLink}>{job.company}</Link>
+                    </td>
                     <td className={styles.tdRole}>
-                      <div>{job.title}</div>
-                      {job.description && (
-                        <div className={styles.description}>
-                          {job.description.slice(0, 120)}...
-                        </div>
-                      )}
+                      <Link href={`/jobs/${job.id}`} className={styles.rowLink}>
+                        <div>{job.title}</div>
+                        {job.description && (
+                          <div className={styles.description}>
+                            {job.description.slice(0, 120)}...
+                          </div>
+                        )}
+                      </Link>
                     </td>
                     <td className={styles.td}>
                       <StatusSelect id={job.id} status={job.status} />

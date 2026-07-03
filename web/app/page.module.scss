@@ -104,6 +104,12 @@ $zinc-900: #18181b;
   max-width: 280px;
 }
 
+.rowLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
 .description {
   font-size: 0.75rem;
   color: $zinc-400;

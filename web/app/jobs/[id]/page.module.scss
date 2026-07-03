@@ -1,0 +1,153 @@
+$zinc-50: #fafafa;
+$zinc-100: #f4f4f5;
+$zinc-200: #e4e4e7;
+$zinc-400: #a1a1aa;
+$zinc-600: #52525b;
+$zinc-900: #18181b;
+
+.page {
+  min-height: 100vh;
+  background: $zinc-50;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.back {
+  display: inline-block;
+  font-size: 0.875rem;
+  color: $zinc-400;
+  text-decoration: none;
+  margin-bottom: 24px;
+  transition: color 0.1s;
+
+  &:hover {
+    color: $zinc-900;
+  }
+}
+
+.card {
+  background: white;
+  border: 1px solid $zinc-200;
+  border-radius: 12px;
+  padding: 32px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: $zinc-900;
+  letter-spacing: -0.02em;
+}
+
+.company {
+  font-size: 0.875rem;
+  color: $zinc-400;
+  margin-top: 4px;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-top: 1px solid $zinc-100;
+  border-bottom: 1px solid $zinc-100;
+  margin-bottom: 28px;
+}
+
+.date {
+  font-size: 0.8rem;
+  color: $zinc-400;
+}
+
+.link {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: $zinc-600;
+  text-decoration: none;
+  transition: color 0.1s;
+
+  &:hover {
+    color: $zinc-900;
+  }
+}
+
+.description {
+  margin-top: 4px;
+}
+
+.descTitle {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $zinc-400;
+  margin-bottom: 12px;
+}
+
+.descBody {
+  font-size: 0.875rem;
+  color: $zinc-600;
+  line-height: 1.7;
+
+  p {
+    margin-bottom: 8px;
+
+    &:empty {
+      display: none;
+    }
+  }
+}
+
+.badge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: capitalize;
+  display: inline-block;
+
+  &.greenhouse {
+    background: #d1fae5;
+    color: #047857;
+  }
+
+  &.lever {
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+
+  &.ashby {
+    background: #ede9fe;
+    color: #6d28d9;
+  }
+
+  &.workday {
+    background: #fef3c7;
+    color: #b45309;
+  }
+
+  &.default {
+    background: $zinc-100;
+    color: $zinc-600;
+  }
+}
