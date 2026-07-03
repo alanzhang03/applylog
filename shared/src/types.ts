@@ -19,5 +19,6 @@ export interface ScrapedJob {
 export interface Job extends ScrapedJob {
   id: string;
   status: ApplicationStatus;
+  description: string;
   scrapedAt: string;
 }

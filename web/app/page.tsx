@@ -12,6 +12,7 @@ type Job = {
   provider: string;
   status: string;
   scraped_at: string;
+  description: string;
 };
 
 export default async function Home() {
@@ -22,7 +23,9 @@ export default async function Home() {
 
   const { data: jobs, error } = await supabase
     .from('jobs')
-    .select('id, url, title, company, provider, status, scraped_at')
+    .select(
+      'id, url, title, company, provider, status, scraped_at, description',
+    )
     .eq('user_id', user?.id)
     .order('scraped_at', { ascending: false });
 
@@ -71,7 +74,14 @@ export default async function Home() {
                 {jobs.map((job: Job) => (
                   <tr key={job.id}>
                     <td className={styles.tdCompany}>{job.company}</td>
-                    <td className={styles.tdRole}>{job.title}</td>
+                    <td className={styles.tdRole}>
+                      <div>{job.title}</div>
+                      {job.description && (
+                        <div className={styles.description}>
+                          {job.description.slice(0, 120)}...
+                        </div>
+                      )}
+                    </td>
                     <td className={styles.td}>
                       <StatusSelect id={job.id} status={job.status} />
                     </td>
