@@ -1,8 +1,10 @@
 'use client';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import styles from './GmailSync.module.scss';
+
+const POLL_INTERVAL_MS = 4 * 60 * 1000;
 
 function extractCompany(subject: string): string | null {
   const patterns = [
@@ -27,7 +29,11 @@ export default function GmailSync() {
   const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const syncingRef = useRef(false);
+
   const sync = useCallback(async () => {
+    if (syncingRef.current) return;
+    syncingRef.current = true;
     setSyncing(true);
     setError(null);
     try {
@@ -98,11 +104,14 @@ export default function GmailSync() {
       setError('Sync failed — try again in a moment.');
     } finally {
       setSyncing(false);
+      syncingRef.current = false;
     }
   }, [router]);
 
   useEffect(() => {
     sync();
+    const interval = setInterval(sync, POLL_INTERVAL_MS);
+    return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
