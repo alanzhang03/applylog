@@ -46,6 +46,65 @@ $zinc-900: #18181b;
   font-size: 0.875rem;
 }
 
+.onboarding {
+  border: 1px solid $zinc-200;
+  border-radius: 12px;
+  background: white;
+  padding: 48px 40px;
+  text-align: center;
+}
+
+.onboardingTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: $zinc-900;
+  margin-bottom: 8px;
+}
+
+.onboardingSubtitle {
+  font-size: 0.875rem;
+  color: $zinc-400;
+  margin-bottom: 32px;
+}
+
+.onboardingSteps {
+  list-style: none;
+  max-width: 420px;
+  margin: 0 auto;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-size: 0.875rem;
+    color: $zinc-600;
+    line-height: 1.5;
+  }
+}
+
+.onboardingNumber {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: $zinc-100;
+  color: $zinc-900;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.untitled {
+  color: $zinc-400;
+  font-style: italic;
+}
+
 .tableWrapper {
   border: 1px solid $zinc-200;
   border-radius: 12px;
@@ -97,6 +156,7 @@ $zinc-900: #18181b;
   font-weight: 500;
   color: $zinc-900;
   white-space: nowrap;
+  text-transform: capitalize;
 }
 
 .tdRole {
@@ -115,6 +175,9 @@ $zinc-900: #18181b;
   color: $zinc-400;
   margin-top: 3px;
   line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tdDate {
@@ -171,5 +234,95 @@ $zinc-900: #18181b;
   &.default {
     background: $zinc-100;
     color: $zinc-600;
+  }
+}
+
+.statsBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.statChip {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  border: 1px solid $zinc-200;
+  background: white;
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.1s, box-shadow 0.1s;
+
+  &:hover {
+    border-color: $zinc-400;
+  }
+
+  &.statChipActive {
+    border-color: $zinc-900;
+    box-shadow: 0 0 0 1px $zinc-900;
+  }
+
+  &.saved .statValue { color: #71717a; }
+  &.applied .statValue { color: #1d4ed8; }
+  &.screen .statValue { color: #a16207; }
+  &.interview .statValue { color: #7e22ce; }
+  &.offer .statValue { color: #15803d; }
+  &.rejected .statValue { color: #b91c1c; }
+}
+
+.statValue {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: $zinc-400;
+  text-transform: capitalize;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.searchInput {
+  flex: 1;
+  border: 1px solid $zinc-200;
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: $zinc-900;
+  background: white;
+
+  &:focus {
+    outline: none;
+    border-color: $zinc-400;
+  }
+
+  &::placeholder {
+    color: $zinc-400;
+  }
+}
+
+.selectFilter {
+  border: 1px solid $zinc-200;
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: $zinc-600;
+  background: white;
+  text-transform: capitalize;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: $zinc-400;
   }
 }

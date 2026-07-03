@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase-server';
+import AppHeader from '@/app/components/AppHeader';
 import StatusSelect from '@/app/components/StatusSelect';
 import styles from './page.module.scss';
 
@@ -18,6 +19,7 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
 
   return (
     <div className={styles.page}>
+      <AppHeader />
       <div className={styles.container}>
         <Link href="/dashboard" className={styles.back}>← Back</Link>
 
