@@ -1,4 +1,8 @@
 import Link from 'next/link';
+
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+}
 import { createClient } from '@/lib/supabase-server';
 import StatusSelect from './components/StatusSelect';
 import LogoutButton from './components/LogoutButton';
@@ -82,7 +86,7 @@ export default async function Home() {
                         <div>{job.title}</div>
                         {job.description && (
                           <div className={styles.description}>
-                            {job.description.slice(0, 120)}...
+                            {stripHtml(job.description).slice(0, 120)}...
                           </div>
                         )}
                       </Link>

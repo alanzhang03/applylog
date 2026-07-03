@@ -51,11 +51,18 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
           {job.description && (
             <div className={styles.description}>
               <h2 className={styles.descTitle}>Job Description</h2>
-              <div className={styles.descBody}>
-                {job.description.split('\n').map((line: string, i: number) => (
-                  <p key={i}>{line}</p>
-                ))}
-              </div>
+              {/<[a-z][\s\S]*>/i.test(job.description) ? (
+                <div
+                  className={styles.descBody}
+                  dangerouslySetInnerHTML={{ __html: job.description }}
+                />
+              ) : (
+                <div className={styles.descBody}>
+                  {job.description.split('\n').map((line: string, i: number) => (
+                    <p key={i}>{line}</p>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -9,13 +9,26 @@ function text(selector: string): string {
   return document.querySelector(selector)?.textContent?.trim() ?? '';
 }
 
+function sanitize(html: string): string {
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+    .replace(/\son\w+="[^"]*"/gi, '')
+    .replace(/\son\w+='[^']*'/gi, '');
+}
+
+function innerHtml(selector: string): string {
+  const el = document.querySelector(selector);
+  return el ? sanitize(el.innerHTML) : '';
+}
+
 function scrapeGreenhouse(): Partial<ScrapedJob> {
   const companyFromTitle =
     document.title.match(/\bat\s+(.+)$/i)?.[1]?.trim() ?? '';
   return {
     title: text('.app-title') || text('h1'),
     company: companyFromTitle,
-    description: text('#content') || text('.job__description'),
+    description: innerHtml('#content') || innerHtml('.job__description'),
   };
 }
 
@@ -25,22 +38,19 @@ function scrapeWorkday(): Partial<ScrapedJob> {
   return {
     title: text('[data-automation-id="jobPostingHeader"]') || document.title.split(' - ')[0].trim(),
     company,
-    description: text('[data-automation-id="jobPostingDescription"]'),
+    description: innerHtml('[data-automation-id="jobPostingDescription"]'),
   };
 }
 
 function scrapeLever(): Partial<ScrapedJob> {
   const company = new URL(location.href).pathname.split('/')[1] ?? '';
-
   const descEl = document.querySelector('[data-qa="job-description"]');
-  const description = descEl
-    ? [...descEl.children]
-        .filter((c) => !c.className.includes('simplify'))
-        .map((c) => c.textContent?.trim())
-        .filter(Boolean)
-        .join('\n')
-    : '';
-
+  let description = '';
+  if (descEl) {
+    const clone = descEl.cloneNode(true) as Element;
+    clone.querySelectorAll('[class*="simplify"]').forEach((el) => el.remove());
+    description = sanitize(clone.innerHTML);
+  }
   return {
     title: text('.posting-headline h2') || text('h2'),
     company,
@@ -53,11 +63,9 @@ function ashbyDescriptionFromDoc(doc: Document): string {
     doc.querySelector('[aria-labelledby="job-overview"]') ??
     doc.querySelector('#overview');
   if (!panel) return '';
-  return [...panel.children]
-    .filter((c) => !c.className.includes('simplify'))
-    .map((c) => c.textContent?.trim())
-    .filter(Boolean)
-    .join('\n');
+  const clone = panel.cloneNode(true) as Element;
+  clone.querySelectorAll('[class*="simplify"]').forEach((el) => el.remove());
+  return sanitize(clone.innerHTML);
 }
 
 function scrapeAshby(): Partial<ScrapedJob> {
