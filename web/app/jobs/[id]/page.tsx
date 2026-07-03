@@ -19,7 +19,7 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
   return (
     <div className={styles.page}>
       <div className={styles.container}>
-        <Link href="/" className={styles.back}>← Back</Link>
+        <Link href="/dashboard" className={styles.back}>← Back</Link>
 
         <div className={styles.card}>
           <div className={styles.header}>

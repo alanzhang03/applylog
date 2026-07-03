@@ -23,13 +23,13 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  const publicPaths = ['/login', '/auth/callback'];
+  const publicPaths = ['/', '/login', '/auth/callback'];
   if (!user && !publicPaths.includes(request.nextUrl.pathname)) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  if (user && request.nextUrl.pathname === '/login') {
-    return NextResponse.redirect(new URL('/', request.url));
+  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/')) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   return response;

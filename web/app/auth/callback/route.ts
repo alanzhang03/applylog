@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get('code');
   const origin = request.nextUrl.origin;
-  const response = NextResponse.redirect(`${origin}/`);
+  const response = NextResponse.redirect(`${origin}/dashboard`);
 
   if (code) {
     const supabase = createServerClient(
