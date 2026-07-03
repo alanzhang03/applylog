@@ -8,6 +8,7 @@
     "*://*.greenhouse.io/*",
     "*://*.lever.co/*",
     "*://*.ashbyhq.com/*",
+    "*://*.myworkdayjobs.com/*",
     "https://*.supabase.co/*"
   ],
   "action": {
@@ -23,7 +24,8 @@
       "matches": [
         "*://*.greenhouse.io/*",
         "*://*.lever.co/*",
-        "*://*.ashbyhq.com/*"
+        "*://*.ashbyhq.com/*",
+        "*://*.myworkdayjobs.com/*"
       ],
       "js": ["src/content.ts"],
       "run_at": "document_idle"

@@ -11,6 +11,7 @@ export function detectProvider(url: string): ATSProvider | null {
   if (host.endsWith('greenhouse.io')) return 'greenhouse';
   if (host.endsWith('lever.co')) return 'lever';
   if (host.endsWith('ashbyhq.com')) return 'ashby';
+  if (host.endsWith('myworkdayjobs.com')) return 'workday';
   return null;
 }
 
@@ -25,5 +26,7 @@ export function isJobPostingUrl(url: string): boolean {
       return /lever\.co\/[^/]+\/[0-9a-f-]{20,}/i.test(url);
     case 'ashby':
       return /ashbyhq\.com\/[^/]+\/[0-9a-f-]{20,}/i.test(url);
+    case 'workday':
+      return /\/job\//.test(url);
   }
 }

@@ -19,6 +19,16 @@ function scrapeGreenhouse(): Partial<ScrapedJob> {
   };
 }
 
+function scrapeWorkday(): Partial<ScrapedJob> {
+  const host = new URL(location.href).hostname;
+  const company = host.split('.wd')[0];
+  return {
+    title: text('[data-automation-id="jobPostingHeader"]') || document.title.split(' - ')[0].trim(),
+    company,
+    description: text('[data-automation-id="jobPostingDescription"]'),
+  };
+}
+
 function scrapeLever(): Partial<ScrapedJob> {
   const company = new URL(location.href).pathname.split('/')[1] ?? '';
 
@@ -86,6 +96,7 @@ function scrape(provider: ATSProvider): ScrapedJob {
     greenhouse: scrapeGreenhouse,
     lever: scrapeLever,
     ashby: scrapeAshby,
+    workday: scrapeWorkday,
   };
   const fields = scrapers[provider]();
   return {

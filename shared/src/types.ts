@@ -1,4 +1,4 @@
-export type ATSProvider = 'greenhouse' | 'lever' | 'ashby';
+export type ATSProvider = 'greenhouse' | 'lever' | 'ashby' | 'workday';
 
 export type ApplicationStatus =
   | 'saved'
