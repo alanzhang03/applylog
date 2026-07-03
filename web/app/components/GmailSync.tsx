@@ -1,7 +1,8 @@
 'use client';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import styles from './GmailSync.module.scss';
 
 function extractCompany(subject: string): string | null {
   const patterns = [
@@ -22,8 +23,14 @@ function extractCompany(subject: string): string | null {
 
 export default function GmailSync() {
   const router = useRouter();
-  useEffect(() => {
-    async function sync() {
+  const [syncing, setSyncing] = useState(false);
+  const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const sync = useCallback(async () => {
+    setSyncing(true);
+    setError(null);
+    try {
       const last_synced_at = localStorage.getItem('last_synced_at');
       const after_date =
         last_synced_at ??
@@ -37,6 +44,7 @@ export default function GmailSync() {
       } = await supabase.auth.getSession();
       const token = session?.provider_token;
       if (!token) {
+        setError('Gmail access expired — sign out and back in to reconnect.');
         return;
       }
       const query = `after:${after_date} subject:("your application" OR "application received" OR "thank you for applying" OR "we received your application")`;
@@ -44,6 +52,10 @@ export default function GmailSync() {
         `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(query)}&maxResults=25`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
+      if (!listRes.ok) {
+        setError(`Gmail request failed (${listRes.status})`);
+        return;
+      }
       const listData = await listRes.json();
       const messages = listData.messages ?? [];
       let messages_wanted: { id: string; subject: string }[] = [];
@@ -66,7 +78,7 @@ export default function GmailSync() {
             .filter(Boolean) as string[],
         ),
       ];
-      const { data: matchedJobs, error } = await supabase
+      const { data: matchedJobs } = await supabase
         .from('jobs')
         .select('id, company')
         .eq('user_id', session?.user.id)
@@ -76,14 +88,42 @@ export default function GmailSync() {
         await supabase.from('jobs').update({ status: 'applied' }).in('id', ids);
         router.refresh();
       }
+      const now = new Date();
       localStorage.setItem(
         'last_synced_at',
-        new Date().toISOString().slice(0, 10).replace(/-/g, '/'),
+        now.toISOString().slice(0, 10).replace(/-/g, '/'),
       );
+      setLastSyncedAt(now);
+    } catch {
+      setError('Sync failed — try again in a moment.');
+    } finally {
+      setSyncing(false);
     }
+  }, [router]);
 
+  useEffect(() => {
     sync();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return null;
+  return (
+    <div className={styles.syncBar}>
+      <button onClick={sync} disabled={syncing} className={styles.button}>
+        {syncing ? 'Syncing…' : 'Sync now'}
+      </button>
+      {error ? (
+        <span className={styles.error}>{error}</span>
+      ) : (
+        lastSyncedAt && (
+          <span className={styles.status}>
+            Synced{' '}
+            {lastSyncedAt.toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              minute: '2-digit',
+            })}
+          </span>
+        )
+      )}
+    </div>
+  );
 }

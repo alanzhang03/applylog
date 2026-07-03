@@ -34,13 +34,13 @@ export default async function Dashboard() {
   return (
     <div className={styles.page}>
       <AppHeader />
-      <GmailSync />
       <div className={styles.container}>
         <div className={styles.header}>
           <div>
             <h1 className={styles.title}>Job Tracker</h1>
             <p className={styles.subtitle}>{jobs?.length ?? 0} jobs saved</p>
           </div>
+          <GmailSync />
         </div>
 
         <JobsTable jobs={jobs ?? []} />

@@ -116,6 +116,22 @@ function scrape(provider: ATSProvider): ScrapedJob {
   };
 }
 
+const NON_JOB_TITLE_PATTERNS = [
+  /^thank you for applying/i,
+  /^create( your)? account/i,
+  /^sign in$/i,
+  /^log ?in$/i,
+  /^application (submitted|received|confirmation)/i,
+  /^review your application/i,
+  /^my applications?$/i,
+];
+
+function isLikelyJobPosting(job: ScrapedJob): boolean {
+  const title = job.title.trim();
+  if (!title) return false;
+  return !NON_JOB_TITLE_PATTERNS.some((pattern) => pattern.test(title));
+}
+
 function tryRun(provider: ATSProvider): ScrapedJob | null {
   const job = scrape(provider);
   return job.title ? job : null;
@@ -134,6 +150,8 @@ if (provider && isJobPostingUrl(location.href)) {
       job.description = await ashbyDescriptionViaTabSwitch();
     }
 
-    chrome.runtime.sendMessage(job);
+    if (isLikelyJobPosting(job)) {
+      chrome.runtime.sendMessage(job);
+    }
   })();
 }
