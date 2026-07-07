@@ -14,6 +14,12 @@ function stripHtml(html: string): string {
     .trim();
 }
 
+function matchTier(score: number): 'matchHigh' | 'matchMedium' | 'matchLow' {
+  if (score >= 0.7) return 'matchHigh';
+  if (score >= 0.4) return 'matchMedium';
+  return 'matchLow';
+}
+
 export type Job = {
   id: string;
   url: string;
@@ -204,9 +210,15 @@ export default function JobsTable({ jobs }: { jobs: Job[] }) {
                     })}
                   </td>
                   <td className={styles.td}>
-                    {job.match_score !== null
-                      ? `${Math.round(job.match_score * 100)}%`
-                      : '—'}
+                    {job.match_score !== null ? (
+                      <span
+                        className={`${styles.matchBadge} ${styles[matchTier(job.match_score)]}`}
+                      >
+                        {Math.round(job.match_score * 100)}%
+                      </span>
+                    ) : (
+                      <span className={styles.matchEmpty}>—</span>
+                    )}
                   </td>
                   <td className={styles.tdActions}>
                     <div className={styles.actionsRow}>
