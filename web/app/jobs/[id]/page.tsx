@@ -12,11 +12,19 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
 
   const { data: job } = await supabase
     .from('jobs')
-    .select('id, url, title, company, provider, status, scraped_at, description')
+    .select('id, url, title, company, provider, status, scraped_at, description, resume_id')
     .eq('id', id)
     .single();
 
   if (!job) notFound();
+
+  const { data: resume } = job.resume_id
+    ? await supabase
+        .from('resumes')
+        .select('content, created_at')
+        .eq('id', job.resume_id)
+        .single()
+    : { data: null };
 
   return (
     <div className={styles.page}>
@@ -71,6 +79,22 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {resume && (
+            <div className={styles.description}>
+              <h2 className={styles.descTitle}>Resume Used</h2>
+              <details>
+                <summary>
+                  {new Date(resume.created_at).toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </summary>
+                <div className={styles.descBody}>{resume.content}</div>
+              </details>
             </div>
           )}
         </div>

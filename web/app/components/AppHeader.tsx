@@ -6,7 +6,14 @@ export default function AppHeader() {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <Link href="/dashboard" className={styles.wordmark}>AutoTrack</Link>
+        <nav className={styles.nav}>
+          <Link href='/dashboard' className={styles.wordmark}>
+            AutoTrack
+          </Link>
+          <Link href='/resume' className={styles.navLink}>
+            Resume
+          </Link>
+        </nav>
         <LogoutButton />
       </div>
     </header>

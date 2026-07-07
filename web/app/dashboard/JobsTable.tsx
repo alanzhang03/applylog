@@ -8,7 +8,10 @@ import DeleteJobButton from '@/app/components/DeleteJobButton';
 import styles from './page.module.scss';
 
 function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  return html
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 export type Job = {
@@ -20,9 +23,17 @@ export type Job = {
   status: string;
   scraped_at: string;
   description: string;
+  match_score: number | null;
 };
 
-const STATUSES = ['saved', 'applied', 'screen', 'interview', 'offer', 'rejected'] as const;
+const STATUSES = [
+  'saved',
+  'applied',
+  'screen',
+  'interview',
+  'offer',
+  'rejected',
+] as const;
 
 export default function JobsTable({ jobs }: { jobs: Job[] }) {
   const router = useRouter();
@@ -74,12 +85,14 @@ export default function JobsTable({ jobs }: { jobs: Job[] }) {
       <div className={styles.onboarding}>
         <h2 className={styles.onboardingTitle}>No jobs yet</h2>
         <p className={styles.onboardingSubtitle}>
-          Jobs show up here automatically once the extension is tracking your browsing.
+          Jobs show up here automatically once the extension is tracking your
+          browsing.
         </p>
         <ol className={styles.onboardingSteps}>
           <li>
             <span className={styles.onboardingNumber}>1</span>
-            Install the AutoTrack Chrome extension and load it as an unpacked extension.
+            Install the AutoTrack Chrome extension and load it as an unpacked
+            extension.
           </li>
           <li>
             <span className={styles.onboardingNumber}>2</span>
@@ -87,7 +100,8 @@ export default function JobsTable({ jobs }: { jobs: Job[] }) {
           </li>
           <li>
             <span className={styles.onboardingNumber}>3</span>
-            Browse a job posting on Greenhouse, Lever, Ashby, or Workday — it&apos;ll be saved here automatically.
+            Browse a job posting on Greenhouse, Lever, Ashby, or Workday —
+            it&apos;ll be saved here automatically.
           </li>
         </ol>
       </div>
@@ -101,7 +115,9 @@ export default function JobsTable({ jobs }: { jobs: Job[] }) {
           <button
             key={status}
             className={`${styles.statChip} ${styles[status]} ${statusFilter === status ? styles.statChipActive : ''}`}
-            onClick={() => setStatusFilter(statusFilter === status ? 'all' : status)}
+            onClick={() =>
+              setStatusFilter(statusFilter === status ? 'all' : status)
+            }
           >
             <span className={styles.statValue}>{counts[status]}</span>
             <span className={styles.statLabel}>{status}</span>
@@ -111,8 +127,8 @@ export default function JobsTable({ jobs }: { jobs: Job[] }) {
 
       <div className={styles.filters}>
         <input
-          type="text"
-          placeholder="Search company or role..."
+          type='text'
+          placeholder='Search company or role...'
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className={styles.searchInput}
@@ -122,9 +138,11 @@ export default function JobsTable({ jobs }: { jobs: Job[] }) {
           onChange={(e) => setSourceFilter(e.target.value)}
           className={styles.selectFilter}
         >
-          <option value="all">All sources</option>
+          <option value='all'>All sources</option>
           {providers.map((provider) => (
-            <option key={provider} value={provider}>{provider}</option>
+            <option key={provider} value={provider}>
+              {provider}
+            </option>
           ))}
         </select>
       </div>
@@ -141,6 +159,7 @@ export default function JobsTable({ jobs }: { jobs: Job[] }) {
                 <th className={styles.th}>Status</th>
                 <th className={styles.th}>Source</th>
                 <th className={styles.th}>Date</th>
+                <th className={styles.th}>Match Score</th>
                 <th className={styles.th} />
               </tr>
             </thead>
@@ -148,7 +167,9 @@ export default function JobsTable({ jobs }: { jobs: Job[] }) {
               {filteredJobs.map((job) => (
                 <tr key={job.id}>
                   <td className={styles.tdCompany}>
-                    <Link href={`/jobs/${job.id}`} className={styles.rowLink}>{job.company}</Link>
+                    <Link href={`/jobs/${job.id}`} className={styles.rowLink}>
+                      {job.company}
+                    </Link>
                   </td>
                   <td className={styles.tdRole}>
                     <Link href={`/jobs/${job.id}`} className={styles.rowLink}>
@@ -156,7 +177,10 @@ export default function JobsTable({ jobs }: { jobs: Job[] }) {
                         {job.title || 'Untitled role'}
                       </div>
                       {job.description && (
-                        <div className={styles.description} title={stripHtml(job.description)}>
+                        <div
+                          className={styles.description}
+                          title={stripHtml(job.description)}
+                        >
                           {stripHtml(job.description)}
                         </div>
                       )}
@@ -179,9 +203,18 @@ export default function JobsTable({ jobs }: { jobs: Job[] }) {
                       year: 'numeric',
                     })}
                   </td>
+                  <td className={styles.td}>
+                    {job.match_score !== null
+                      ? `${Math.round(job.match_score * 100)}%`
+                      : '—'}
+                  </td>
                   <td className={styles.tdActions}>
                     <div className={styles.actionsRow}>
-                      <a href={job.url} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={job.url}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                      >
                         View →
                       </a>
                       <DeleteJobButton

@@ -13,7 +13,7 @@ export default async function Dashboard() {
   const { data: jobs, error } = await supabase
     .from('jobs')
     .select(
-      'id, url, title, company, provider, status, scraped_at, description',
+      'id, url, title, company, provider, status, scraped_at, description, match_score',
     )
     .eq('user_id', user?.id)
     .order('scraped_at', { ascending: false });
