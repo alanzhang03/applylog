@@ -35,7 +35,7 @@ export default async function ResumePage() {
         <div className={styles.card}>
           {resumes?.[0] && signedUrls.has(resumes[0].id) && (
             <iframe
-              src={signedUrls.get(resumes[0].id)}
+              src={`${signedUrls.get(resumes[0].id)}#view=FitH`}
               className={styles.savedPreview}
               title='Saved resume PDF'
             />
