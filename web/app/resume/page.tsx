@@ -2,6 +2,15 @@ import { createClient } from '@/lib/supabase-server';
 import AppHeader from '../components/AppHeader';
 import ResumeForm from './ResumeForm';
 import styles from './page.module.scss';
+import ResumeVersions from './ResumeVersions';
+
+function formatDate(value: string) {
+  return new Date(value).toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
 
 export default async function ResumePage() {
   const supabase = await createClient();
@@ -11,7 +20,7 @@ export default async function ResumePage() {
 
   const { data: resumes } = await supabase
     .from('resumes')
-    .select('id, content, created_at, file_path')
+    .select('id, content, created_at, file_path, version')
     .eq('user_id', user?.id)
     .order('created_at', { ascending: false });
 
@@ -25,6 +34,12 @@ export default async function ResumePage() {
   }
 
   const olderResumes = resumes?.slice(1) ?? [];
+  const olderVersions = olderResumes.map((resume) => ({
+    id: resume.id,
+    version: resume.version,
+    date: formatDate(resume.created_at),
+    url: signedUrls.get(resume.id) ?? null,
+  }));
 
   return (
     <div className={styles.page}>
@@ -36,26 +51,16 @@ export default async function ResumePage() {
           <ResumeForm
             initialContent={resumes?.[0]?.content ?? ''}
             savedPdfUrl={
-              resumes?.[0] ? signedUrls.get(resumes[0].id) ?? null : null
+              resumes?.[0] ? (signedUrls.get(resumes[0].id) ?? null) : null
             }
           />
         </div>
 
-        {olderResumes.length > 0 && (
+        {olderVersions.length > 0 && (
           <>
+            {' '}
             <h2 className={styles.historyTitle}>Past Versions</h2>
-            {olderResumes.map((resume) => (
-              <details key={resume.id} className={styles.historyItem}>
-                <summary>
-                  {new Date(resume.created_at).toLocaleDateString('en-US', {
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
-                </summary>
-                <p>{resume.content}</p>
-              </details>
-            ))}
+            <ResumeVersions versions={olderVersions} />
           </>
         )}
       </div>

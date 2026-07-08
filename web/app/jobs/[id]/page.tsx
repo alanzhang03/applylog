@@ -6,13 +6,19 @@ import StatusSelect from '@/app/components/StatusSelect';
 import DeleteJobButton from '@/app/components/DeleteJobButton';
 import styles from './page.module.scss';
 
-export default async function JobPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function JobPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const supabase = await createClient();
 
   const { data: job } = await supabase
     .from('jobs')
-    .select('id, url, title, company, provider, status, scraped_at, description, resume_id')
+    .select(
+      'id, url, title, company, provider, status, scraped_at, description, resume_id',
+    )
     .eq('id', id)
     .single();
 
@@ -21,7 +27,7 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
   const { data: resume } = job.resume_id
     ? await supabase
         .from('resumes')
-        .select('content, created_at')
+        .select('version')
         .eq('id', job.resume_id)
         .single()
     : { data: null };
@@ -30,7 +36,9 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
     <div className={styles.page}>
       <AppHeader />
       <div className={styles.container}>
-        <Link href="/dashboard" className={styles.back}>← Back</Link>
+        <Link href='/dashboard' className={styles.back}>
+          ← Back
+        </Link>
 
         <div className={styles.card}>
           <div className={styles.header}>
@@ -39,7 +47,9 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
               <p className={styles.company}>{job.company}</p>
             </div>
             <div className={styles.meta}>
-              <span className={`${styles.badge} ${styles[job.provider] ?? styles.default}`}>
+              <span
+                className={`${styles.badge} ${styles[job.provider] ?? styles.default}`}
+              >
                 {job.provider}
               </span>
               <StatusSelect id={job.id} status={job.status} />
@@ -48,17 +58,27 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
 
           <div className={styles.info}>
             <span className={styles.date}>
-              Saved {new Date(job.scraped_at).toLocaleDateString('en-US', {
+              Saved{' '}
+              {new Date(job.scraped_at).toLocaleDateString('en-US', {
                 month: 'long',
                 day: 'numeric',
                 year: 'numeric',
               })}
             </span>
             <div className={styles.infoActions}>
-              <a href={job.url} target="_blank" rel="noopener noreferrer" className={styles.link}>
+              <a
+                href={job.url}
+                target='_blank'
+                rel='noopener noreferrer'
+                className={styles.link}
+              >
                 View posting →
               </a>
-              <DeleteJobButton id={job.id} className={styles.deleteButton} redirectTo="/dashboard">
+              <DeleteJobButton
+                id={job.id}
+                className={styles.deleteButton}
+                redirectTo='/dashboard'
+              >
                 Delete
               </DeleteJobButton>
             </div>
@@ -74,9 +94,11 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
                 />
               ) : (
                 <div className={styles.descBody}>
-                  {job.description.split('\n').map((line: string, i: number) => (
-                    <p key={i}>{line}</p>
-                  ))}
+                  {job.description
+                    .split('\n')
+                    .map((line: string, i: number) => (
+                      <p key={i}>{line}</p>
+                    ))}
                 </div>
               )}
             </div>
@@ -85,16 +107,9 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
           {resume && (
             <div className={styles.description}>
               <h2 className={styles.descTitle}>Resume Used</h2>
-              <details>
-                <summary>
-                  {new Date(resume.created_at).toLocaleDateString('en-US', {
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
-                </summary>
-                <div className={styles.descBody}>{resume.content}</div>
-              </details>
+              <Link href={`/resume#v${resume.version}`} className={styles.link}>
+                Resume v{resume.version} →
+              </Link>
             </div>
           )}
         </div>

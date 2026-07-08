@@ -31,9 +31,22 @@ export async function POST(request: Request) {
     }
   }
 
-  const { error } = await supabase
+  const { data: last } = await supabase
     .from('resumes')
-    .insert({ user_id: user.id, content, embedding, file_path: filePath });
+    .select('version')
+    .eq('user_id', user.id)
+    .order('version', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const version = (last?.version ?? 0) + 1;
+
+  const { error } = await supabase.from('resumes').insert({
+    user_id: user.id,
+    content,
+    embedding,
+    file_path: filePath,
+    version,
+  });
   if (error) {
     throw new Error(`error: ${error}`);
   }
