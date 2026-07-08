@@ -1,3 +1,4 @@
+$zinc-100: #f4f4f5;
 $zinc-200: #e4e4e7;
 $zinc-400: #a1a1aa;
 $zinc-600: #52525b;
@@ -8,43 +9,63 @@ $zinc-900: #18181b;
   align-items: center;
   gap: 12px;
   margin-bottom: 20px;
-  font-size: 0.875rem;
-  color: $zinc-600;
 }
 
-.extracting {
+.hiddenInput {
+  display: none;
+}
+
+.uploadButton {
   font-size: 0.8rem;
-  color: $zinc-400;
-  margin-bottom: 12px;
-}
+  font-weight: 500;
+  color: $zinc-900;
+  background: white;
+  border: 1px solid $zinc-200;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.1s;
 
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
+  &:hover:not(:disabled) {
+    background: $zinc-100;
+  }
 
-  @media (max-width: 640px) {
-    grid-template-columns: 1fr;
+  &:disabled {
+    cursor: default;
+    opacity: 0.5;
   }
 }
 
-.previewWrap {
-  border: 1px solid $zinc-200;
-  border-radius: 8px;
+.uploadHint {
+  font-size: 0.875rem;
+  color: $zinc-600;
   overflow: hidden;
-  height: 420px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .preview {
   width: 100%;
-  height: 100%;
-  border: none;
+  height: 820px;
+  border: 1px solid $zinc-200;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.textareaLabel {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $zinc-400;
+  margin-bottom: 8px;
 }
 
 .textarea {
   width: 100%;
-  height: 420px;
+  height: 320px;
   border: 1px solid $zinc-200;
   border-radius: 8px;
   padding: 14px;
@@ -53,15 +74,12 @@ $zinc-900: #18181b;
   color: $zinc-900;
   line-height: 1.6;
   resize: vertical;
+  margin-bottom: 20px;
 
   &:focus {
     outline: none;
     border-color: $zinc-400;
   }
-}
-
-.textareaFull {
-  grid-column: 1 / -1;
 }
 
 .button {

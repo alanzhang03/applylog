@@ -33,14 +33,12 @@ export default async function ResumePage() {
         <h1 className={styles.title}>Resume</h1>
 
         <div className={styles.card}>
-          {resumes?.[0] && signedUrls.has(resumes[0].id) && (
-            <iframe
-              src={`${signedUrls.get(resumes[0].id)}#view=FitH`}
-              className={styles.savedPreview}
-              title='Saved resume PDF'
-            />
-          )}
-          <ResumeForm initialContent={resumes?.[0]?.content ?? ''} />
+          <ResumeForm
+            initialContent={resumes?.[0]?.content ?? ''}
+            savedPdfUrl={
+              resumes?.[0] ? signedUrls.get(resumes[0].id) ?? null : null
+            }
+          />
         </div>
 
         {olderResumes.length > 0 && (

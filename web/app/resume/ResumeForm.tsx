@@ -1,21 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './ResumeForm.module.scss';
 
 export default function ResumeForm({
   initialContent,
+  savedPdfUrl,
 }: {
   initialContent: string;
+  savedPdfUrl: string | null;
 }) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [content, setContent] = useState(initialContent);
   const [file, setFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [extracting, setExtracting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const pdfUrl = previewUrl ?? savedPdfUrl;
 
   async function handleSave() {
     setSaving(true);
@@ -72,32 +77,43 @@ export default function ResumeForm({
   return (
     <div>
       <div className={styles.uploadRow}>
-        Upload a PDF to auto-fill the text below (review it before saving):
+        <button
+          type='button'
+          className={styles.uploadButton}
+          onClick={() => fileInputRef.current?.click()}
+          disabled={extracting}
+        >
+          {extracting ? 'Extracting…' : 'Choose PDF'}
+        </button>
+        <span className={styles.uploadHint}>
+          {file
+            ? file.name
+            : 'Upload a PDF of your Resume to auto-fill the text below (review it before saving)'}
+        </span>
         <input
+          ref={fileInputRef}
           type='file'
           accept='application/pdf'
           onChange={handleFileChange}
           disabled={extracting}
+          className={styles.hiddenInput}
         />
       </div>
-      {extracting && <p className={styles.extracting}>Extracting text…</p>}
 
-      <div className={styles.grid}>
-        {previewUrl && (
-          <div className={styles.previewWrap}>
-            <iframe
-              src={previewUrl}
-              className={styles.preview}
-              title='Uploaded resume PDF'
-            />
-          </div>
-        )}
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className={`${styles.textarea} ${!previewUrl ? styles.textareaFull : ''}`}
+      {pdfUrl && (
+        <iframe
+          src={`${pdfUrl}#view=FitH`}
+          className={styles.preview}
+          title='Resume PDF'
         />
-      </div>
+      )}
+
+      <label className={styles.textareaLabel}>Parsed text</label>
+      <textarea
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        className={styles.textarea}
+      />
 
       <button onClick={handleSave} disabled={saving} className={styles.button}>
         {saving ? 'Saving…' : 'Save'}
