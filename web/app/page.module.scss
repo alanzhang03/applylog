@@ -208,6 +208,18 @@ $zinc-900: #18181b;
   &.workday { background: #fef3c7; color: #b45309; }
 }
 
+.matchBadge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-block;
+
+  &.matchHigh { background: #dcfce7; color: #15803d; }
+  &.matchMedium { background: #fef9c3; color: #a16207; }
+  &.matchLow { background: #fee2e2; color: #b91c1c; }
+}
+
 // Shared section layout
 
 .section {

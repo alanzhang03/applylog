@@ -35,14 +35,59 @@ const features = [
     description:
       'Move jobs through saved → applied → screen → interview → offer as your pipeline progresses.',
   },
+  {
+    title: 'Resume match scoring',
+    description:
+      'Every posting gets a match score from the similarity between your resume and the job description — so you can prioritize the roles you fit best.',
+  },
+  {
+    title: 'Resume library',
+    description:
+      'Upload your resume as a PDF and keep every version. AutoTrack stores the original file, not just the text, so you always have what you sent.',
+  },
+  {
+    title: 'Know what you sent',
+    description:
+      'Each job links to the exact resume version used to apply — click through to view that PDF, side by side with the posting.',
+  },
 ];
 
 const previewJobs = [
-  { company: 'Stripe', title: 'Product Engineer', status: 'applied', provider: 'greenhouse' },
-  { company: 'Figma', title: 'Frontend Engineer', status: 'interview', provider: 'lever' },
-  { company: 'Notion', title: 'Software Engineer', status: 'screen', provider: 'ashby' },
-  { company: 'Airbnb', title: 'Backend Engineer', status: 'saved', provider: 'workday' },
+  {
+    company: 'Stripe',
+    title: 'Software Engineer',
+    status: 'applied',
+    provider: 'greenhouse',
+    match: 0.91,
+  },
+  {
+    company: 'Figma',
+    title: 'Frontend Engineer',
+    status: 'interview',
+    provider: 'lever',
+    match: 0.74,
+  },
+  {
+    company: 'Notion',
+    title: 'Product Engineer',
+    status: 'screen',
+    provider: 'ashby',
+    match: 0.52,
+  },
+  {
+    company: 'Airbnb',
+    title: 'Backend Engineer',
+    status: 'saved',
+    provider: 'workday',
+    match: 0.38,
+  },
 ];
+
+function matchTier(score: number): 'matchHigh' | 'matchMedium' | 'matchLow' {
+  if (score >= 0.7) return 'matchHigh';
+  if (score >= 0.4) return 'matchMedium';
+  return 'matchLow';
+}
 
 export default function LandingPage() {
   return (
@@ -50,7 +95,9 @@ export default function LandingPage() {
       <nav className={styles.nav}>
         <div className={styles.navInner}>
           <span className={styles.wordmark}>AutoTrack</span>
-          <Link href="/login" className={styles.navLink}>Sign in</Link>
+          <Link href='/login' className={styles.navLink}>
+            Sign in
+          </Link>
         </div>
       </nav>
 
@@ -61,9 +108,10 @@ export default function LandingPage() {
         </h1>
         <p className={styles.heroSubtitle}>
           AutoTrack saves job postings as you browse, detects when you&apos;ve
-          applied via Gmail, and keeps everything organized in one place.
+          applied via Gmail, scores how well each role matches your resume, and
+          keeps everything organized in one place.
         </p>
-        <Link href="/login" className={styles.cta}>
+        <Link href='/login' className={styles.cta}>
           Get started
         </Link>
       </section>
@@ -71,14 +119,16 @@ export default function LandingPage() {
       <section className={styles.previewSection}>
         <div className={styles.previewFrame}>
           <div className={styles.previewBar}>
-            <span className={styles.dot} data-color="red" />
-            <span className={styles.dot} data-color="yellow" />
-            <span className={styles.dot} data-color="green" />
+            <span className={styles.dot} data-color='red' />
+            <span className={styles.dot} data-color='yellow' />
+            <span className={styles.dot} data-color='green' />
           </div>
           <div className={styles.previewBody}>
             <div className={styles.previewHeader}>
               <span>Job Tracker</span>
-              <span className={styles.previewCount}>{previewJobs.length} jobs saved</span>
+              <span className={styles.previewCount}>
+                {previewJobs.length} jobs saved
+              </span>
             </div>
             <table className={styles.previewTable}>
               <thead>
@@ -87,6 +137,7 @@ export default function LandingPage() {
                   <th>Role</th>
                   <th>Status</th>
                   <th>Source</th>
+                  <th>Match</th>
                 </tr>
               </thead>
               <tbody>
@@ -95,13 +146,24 @@ export default function LandingPage() {
                     <td className={styles.previewCompany}>{job.company}</td>
                     <td>{job.title}</td>
                     <td>
-                      <span className={`${styles.statusBadge} ${styles[job.status]}`}>
+                      <span
+                        className={`${styles.statusBadge} ${styles[job.status]}`}
+                      >
                         {job.status}
                       </span>
                     </td>
                     <td>
-                      <span className={`${styles.providerBadge} ${styles[job.provider]}`}>
+                      <span
+                        className={`${styles.providerBadge} ${styles[job.provider]}`}
+                      >
                         {job.provider}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`${styles.matchBadge} ${styles[matchTier(job.match)]}`}
+                      >
+                        {Math.round(job.match * 100)}%
                       </span>
                     </td>
                   </tr>
@@ -139,7 +201,9 @@ export default function LandingPage() {
 
       <footer className={styles.footer}>
         <span className={styles.footerWordmark}>AutoTrack</span>
-        <Link href="/login" className={styles.navLink}>Sign in</Link>
+        <Link href='/login' className={styles.navLink}>
+          Sign in
+        </Link>
       </footer>
     </div>
   );
