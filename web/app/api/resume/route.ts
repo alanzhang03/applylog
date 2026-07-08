@@ -15,11 +15,25 @@ export async function POST(request: Request) {
     return new Response(null, { status: 403 });
   }
 
-  const { content } = await request.json();
+  const formData = await request.formData();
+  const content = formData.get('content') as string;
+  const file = formData.get('file');
+
   const embedding = (await embed([content]))[0];
+  let filePath: string | null = null;
+  if (file instanceof File) {
+    filePath = `${user.id}/${crypto.randomUUID()}.pdf`;
+    const { error: uploadError } = await supabase.storage
+      .from('resumes')
+      .upload(filePath, file, { contentType: 'application/pdf' });
+    if (uploadError) {
+      throw new Error(`upload error: ${uploadError.message}`);
+    }
+  }
+
   const { error } = await supabase
     .from('resumes')
-    .insert({ user_id: user.id, content, embedding });
+    .insert({ user_id: user.id, content, embedding, file_path: filePath });
   if (error) {
     throw new Error(`error: ${error}`);
   }

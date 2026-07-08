@@ -4,9 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './ResumeForm.module.scss';
 
-export default function ResumeForm({ initialContent }: { initialContent: string }) {
+export default function ResumeForm({
+  initialContent,
+}: {
+  initialContent: string;
+}) {
   const router = useRouter();
   const [content, setContent] = useState(initialContent);
+  const [file, setFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [extracting, setExtracting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,10 +21,13 @@ export default function ResumeForm({ initialContent }: { initialContent: string 
     setSaving(true);
     setError(null);
     try {
+      const formData = new FormData();
+      formData.append('content', content);
+      if (file) formData.append('file', file);
+
       const res = await fetch('/api/resume', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content }),
+        body: formData,
       });
       if (!res.ok) {
         setError('Failed to save resume.');
@@ -37,6 +45,7 @@ export default function ResumeForm({ initialContent }: { initialContent: string 
 
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(URL.createObjectURL(file));
+    setFile(file);
 
     setExtracting(true);
     setError(null);
@@ -64,14 +73,23 @@ export default function ResumeForm({ initialContent }: { initialContent: string 
     <div>
       <div className={styles.uploadRow}>
         Upload a PDF to auto-fill the text below (review it before saving):
-        <input type="file" accept="application/pdf" onChange={handleFileChange} disabled={extracting} />
+        <input
+          type='file'
+          accept='application/pdf'
+          onChange={handleFileChange}
+          disabled={extracting}
+        />
       </div>
       {extracting && <p className={styles.extracting}>Extracting text…</p>}
 
       <div className={styles.grid}>
         {previewUrl && (
           <div className={styles.previewWrap}>
-            <iframe src={previewUrl} className={styles.preview} title="Uploaded resume PDF" />
+            <iframe
+              src={previewUrl}
+              className={styles.preview}
+              title='Uploaded resume PDF'
+            />
           </div>
         )}
         <textarea

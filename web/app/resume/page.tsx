@@ -11,9 +11,18 @@ export default async function ResumePage() {
 
   const { data: resumes } = await supabase
     .from('resumes')
-    .select('id, content, created_at')
+    .select('id, content, created_at, file_path')
     .eq('user_id', user?.id)
     .order('created_at', { ascending: false });
+
+  const signedUrls = new Map<string, string>();
+  for (const resume of resumes ?? []) {
+    if (!resume.file_path) continue;
+    const { data } = await supabase.storage
+      .from('resumes')
+      .createSignedUrl(resume.file_path, 60 * 60);
+    if (data) signedUrls.set(resume.id, data.signedUrl);
+  }
 
   const olderResumes = resumes?.slice(1) ?? [];
 
@@ -24,6 +33,13 @@ export default async function ResumePage() {
         <h1 className={styles.title}>Resume</h1>
 
         <div className={styles.card}>
+          {resumes?.[0] && signedUrls.has(resumes[0].id) && (
+            <iframe
+              src={signedUrls.get(resumes[0].id)}
+              className={styles.savedPreview}
+              title='Saved resume PDF'
+            />
+          )}
           <ResumeForm initialContent={resumes?.[0]?.content ?? ''} />
         </div>
 
