@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AutoTrack",
+  title: "ApplyLog",
   description: "Job application tracker",
 };
 

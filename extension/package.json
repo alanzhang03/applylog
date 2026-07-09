@@ -1,5 +1,5 @@
 {
-  "name": "@autotrack/extension",
+  "name": "@applylog/extension",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@autotrack/shared": "*"
+    "@applylog/shared": "*"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.7.0",

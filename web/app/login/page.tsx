@@ -17,7 +17,7 @@ export default function LoginPage() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <h1 className={styles.title}>AutoTrack</h1>
+        <h1 className={styles.title}>ApplyLog</h1>
         <p className={styles.subtitle}>Sign in to see your job applications</p>
         <button onClick={signIn} className={styles.button}>
           <svg width="18" height="18" viewBox="0 0 18 18">

@@ -3,7 +3,7 @@ import {
   isJobPostingUrl,
   type ATSProvider,
   type ScrapedJob,
-} from '@autotrack/shared';
+} from '@applylog/shared';
 
 function text(selector: string): string {
   return document.querySelector(selector)?.textContent?.trim() ?? '';
@@ -138,35 +138,35 @@ function tryRun(provider: ATSProvider): ScrapedJob | null {
 }
 
 const provider = detectProvider(location.href);
-console.log('[AutoTrack] content: provider =', provider, 'url =', location.href);
+console.log('[ApplyLog] content: provider =', provider, 'url =', location.href);
 
 if (!provider) {
-  console.log('[AutoTrack] content: no provider detected for this host, skipping');
+  console.log('[ApplyLog] content: no provider detected for this host, skipping');
 } else if (!isJobPostingUrl(location.href)) {
-  console.log('[AutoTrack] content: url did not match job posting pattern, skipping');
+  console.log('[ApplyLog] content: url did not match job posting pattern, skipping');
 } else {
   (async () => {
     let job = tryRun(provider);
-    console.log('[AutoTrack] content: first scrape attempt', job);
+    console.log('[ApplyLog] content: first scrape attempt', job);
 
     if (!job) {
-      console.log('[AutoTrack] content: no title on first attempt, retrying in 2s');
+      console.log('[ApplyLog] content: no title on first attempt, retrying in 2s');
       await new Promise((r) => setTimeout(r, 2000));
       job = scrape(provider);
-      console.log('[AutoTrack] content: retry scrape result', job);
+      console.log('[ApplyLog] content: retry scrape result', job);
     }
 
     if (provider === 'ashby' && !job.description) {
-      console.log('[AutoTrack] content: ashby description empty, trying tab switch');
+      console.log('[ApplyLog] content: ashby description empty, trying tab switch');
       job.description = await ashbyDescriptionViaTabSwitch();
-      console.log('[AutoTrack] content: ashby description after tab switch', job.description.length, 'chars');
+      console.log('[ApplyLog] content: ashby description after tab switch', job.description.length, 'chars');
     }
 
     if (isLikelyJobPosting(job)) {
-      console.log('[AutoTrack] content: sending scraped job to background', job);
+      console.log('[ApplyLog] content: sending scraped job to background', job);
       chrome.runtime.sendMessage(job);
     } else {
-      console.log('[AutoTrack] content: job failed isLikelyJobPosting check, not sending', job);
+      console.log('[ApplyLog] content: job failed isLikelyJobPosting check, not sending', job);
     }
   })();
 }

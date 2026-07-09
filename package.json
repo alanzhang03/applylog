@@ -1,5 +1,5 @@
 {
-  "name": "autotrack",
+  "name": "applylog",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,8 +8,8 @@
     "extension"
   ],
   "scripts": {
-    "dev": "npm run dev -w @autotrack/extension",
-    "build": "npm run build -w @autotrack/extension"
+    "dev": "npm run dev -w @applylog/extension",
+    "build": "npm run build -w @applylog/extension"
   },
   "devDependencies": {
     "typescript": "~6.0.2"

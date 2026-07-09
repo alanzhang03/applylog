@@ -1,4 +1,4 @@
-import type { ScrapedJob } from '@autotrack/shared';
+import type { ScrapedJob } from '@applylog/shared';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
@@ -42,12 +42,12 @@ async function signIn(): Promise<
       `&redirect_to=${encodeURIComponent(EXT_REDIRECT)}` +
       `&code_challenge=${challenge}&code_challenge_method=S256`;
 
-    console.log('[AutoTrack] launching auth flow:', authUrl);
+    console.log('[ApplyLog] launching auth flow:', authUrl);
     const redirectUrl = await chrome.identity.launchWebAuthFlow({
       url: authUrl,
       interactive: true,
     });
-    console.log('[AutoTrack] auth flow redirected to:', redirectUrl);
+    console.log('[ApplyLog] auth flow redirected to:', redirectUrl);
 
     if (!redirectUrl) {
       return {
@@ -77,7 +77,7 @@ async function signIn(): Promise<
     );
 
     const tokenData = await tokenRes.json();
-    console.log('[AutoTrack] token exchange status:', tokenRes.status);
+    console.log('[ApplyLog] token exchange status:', tokenRes.status);
 
     const { access_token, refresh_token } = tokenData;
     if (!access_token) {
@@ -100,10 +100,10 @@ async function signIn(): Promise<
       email,
       user_id,
     });
-    console.log('[AutoTrack] signed in as', email);
+    console.log('[ApplyLog] signed in as', email);
     return { ok: true, email };
   } catch (err) {
-    console.error('[AutoTrack] sign-in failed:', err);
+    console.error('[ApplyLog] sign-in failed:', err);
     return {
       ok: false,
       error: err instanceof Error ? err.message : String(err),
@@ -116,7 +116,7 @@ let refreshPromise: Promise<string | null> | null = null;
 async function refreshAccessToken(): Promise<string | null> {
   if (refreshPromise) {
     console.log(
-      '[AutoTrack] refreshAccessToken: refresh already in flight, reusing it',
+      '[ApplyLog] refreshAccessToken: refresh already in flight, reusing it',
     );
     return refreshPromise;
   }
@@ -129,13 +129,13 @@ async function refreshAccessToken(): Promise<string | null> {
 async function doRefreshAccessToken(): Promise<string | null> {
   const { refresh_token } = await chrome.storage.local.get(['refresh_token']);
   console.log(
-    '[AutoTrack] refreshAccessToken: have refresh_token?',
+    '[ApplyLog] refreshAccessToken: have refresh_token?',
     !!refresh_token,
   );
 
   if (!refresh_token) {
     console.error(
-      '[AutoTrack] refreshAccessToken: no refresh_token in storage, cannot refresh',
+      '[ApplyLog] refreshAccessToken: no refresh_token in storage, cannot refresh',
     );
     return null;
   }
@@ -153,11 +153,11 @@ async function doRefreshAccessToken(): Promise<string | null> {
   );
 
   const data = await res.json();
-  console.log('[AutoTrack] refreshAccessToken: response status', res.status);
+  console.log('[ApplyLog] refreshAccessToken: response status', res.status);
 
   if (!res.ok || !data.access_token) {
     console.error(
-      '[AutoTrack] refreshAccessToken: failed —',
+      '[ApplyLog] refreshAccessToken: failed —',
       data.error_description ?? data.msg ?? data.error ?? 'unknown error',
     );
     return null;
@@ -167,26 +167,26 @@ async function doRefreshAccessToken(): Promise<string | null> {
     access_token: data.access_token,
     refresh_token: data.refresh_token,
   });
-  console.log('[AutoTrack] refreshAccessToken: refreshed successfully');
+  console.log('[ApplyLog] refreshAccessToken: refreshed successfully');
   return data.access_token as string;
 }
 
 async function saveJob(job: ScrapedJob): Promise<void> {
   try {
-    console.log('[AutoTrack] saveJob: starting for', job.url);
+    console.log('[ApplyLog] saveJob: starting for', job.url);
     const { access_token, user_id } = await chrome.storage.local.get([
       'access_token',
       'user_id',
     ]);
     console.log(
-      '[AutoTrack] saveJob: have access_token?',
+      '[ApplyLog] saveJob: have access_token?',
       !!access_token,
       'user_id?',
       !!user_id,
     );
 
     if (!access_token || !user_id) {
-      console.warn('[AutoTrack] not signed in — job not saved');
+      console.warn('[ApplyLog] not signed in — job not saved');
       return;
     }
 
@@ -208,16 +208,16 @@ async function saveJob(job: ScrapedJob): Promise<void> {
         user_id,
       }),
     });
-    console.log('[AutoTrack] saveJob: insert response status', res.status);
+    console.log('[ApplyLog] saveJob: insert response status', res.status);
 
     if (res.ok) {
-      console.log('[AutoTrack] saved job', job.title, job.company);
+      console.log('[ApplyLog] saved job', job.title, job.company);
     } else if (res.status === 401) {
-      console.log('[AutoTrack] saveJob: got 401, refreshing token');
+      console.log('[ApplyLog] saveJob: got 401, refreshing token');
       const newToken = await refreshAccessToken();
       if (!newToken) {
         console.error(
-          '[AutoTrack] saveJob: token refresh returned no token, giving up',
+          '[ApplyLog] saveJob: token refresh returned no token, giving up',
         );
         return;
       }
@@ -244,40 +244,40 @@ async function saveJob(job: ScrapedJob): Promise<void> {
       );
       if (retry.ok) {
         console.log(
-          '[AutoTrack] saved job after token refresh',
+          '[ApplyLog] saved job after token refresh',
           job.title,
           job.company,
         );
       } else {
         const retryErr = await retry.text();
         console.error(
-          '[AutoTrack] failed after token refresh',
+          '[ApplyLog] failed after token refresh',
           retry.status,
           retryErr,
         );
       }
     } else {
       const err = await res.text();
-      console.error('[AutoTrack] failed to save job', res.status, err);
+      console.error('[ApplyLog] failed to save job', res.status, err);
     }
   } catch (e) {
-    console.error('[AutoTrack] saveJob: threw an exception', e);
+    console.error('[ApplyLog] saveJob: threw an exception', e);
   }
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message?.type === 'AUTOTRACK_SIGN_IN') {
+  if (message?.type === 'APPLYLOG_SIGN_IN') {
     signIn().then(sendResponse);
     return true;
   }
 
-  if (message?.type === 'AUTOTRACK_SIGN_OUT') {
+  if (message?.type === 'APPLYLOG_SIGN_OUT') {
     chrome.storage.local
       .remove(['access_token', 'refresh_token', 'email', 'user_id'])
       .then(() => sendResponse({ ok: true }));
     return true;
   }
 
-  console.log('[AutoTrack] background: received scraped job message', message);
+  console.log('[ApplyLog] background: received scraped job message', message);
   saveJob(message as ScrapedJob);
 });

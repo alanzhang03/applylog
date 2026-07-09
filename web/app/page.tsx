@@ -5,7 +5,7 @@ const steps = [
   {
     title: 'Install the extension',
     description:
-      'Add AutoTrack to Chrome and sign in with Google — no setup, no configuration.',
+      'Add ApplyLog to Chrome and sign in with Google — no setup, no configuration.',
   },
   {
     title: 'Browse job postings',
@@ -15,7 +15,7 @@ const steps = [
   {
     title: 'Stay in sync',
     description:
-      'AutoTrack scans Gmail for confirmation emails and moves matching jobs to "applied" for you.',
+      'ApplyLog scans Gmail for confirmation emails and moves matching jobs to "applied" for you.',
   },
 ];
 
@@ -43,7 +43,7 @@ const features = [
   {
     title: 'Resume library',
     description:
-      'Upload your resume as a PDF and keep every version. AutoTrack stores the original file, not just the text, so you always have what you sent.',
+      'Upload your resume as a PDF and keep every version. ApplyLog stores the original file, not just the text, so you always have what you sent.',
   },
   {
     title: 'Know what you sent',
@@ -94,7 +94,7 @@ export default function LandingPage() {
     <div className={styles.page}>
       <nav className={styles.nav}>
         <div className={styles.navInner}>
-          <span className={styles.wordmark}>AutoTrack</span>
+          <span className={styles.wordmark}>ApplyLog</span>
           <Link href='/login' className={styles.navLink}>
             Sign in
           </Link>
@@ -107,7 +107,7 @@ export default function LandingPage() {
           Automatically track your job applications across the web.
         </h1>
         <p className={styles.heroSubtitle}>
-          AutoTrack saves job postings as you browse, detects when you&apos;ve
+          ApplyLog saves job postings as you browse, detects when you&apos;ve
           applied via Gmail, scores how well each role matches your resume, and
           keeps everything organized in one place.
         </p>
@@ -200,7 +200,7 @@ export default function LandingPage() {
       </section>
 
       <footer className={styles.footer}>
-        <span className={styles.footerWordmark}>AutoTrack</span>
+        <span className={styles.footerWordmark}>ApplyLog</span>
         <Link href='/login' className={styles.navLink}>
           Sign in
         </Link>

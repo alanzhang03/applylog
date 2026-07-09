@@ -97,7 +97,7 @@ export default function JobsTable({ jobs }: { jobs: Job[] }) {
         <ol className={styles.onboardingSteps}>
           <li>
             <span className={styles.onboardingNumber}>1</span>
-            Install the AutoTrack Chrome extension and load it as an unpacked
+            Install the ApplyLog Chrome extension and load it as an unpacked
             extension.
           </li>
           <li>

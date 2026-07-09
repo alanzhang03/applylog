@@ -10,19 +10,19 @@ async function getSession(): Promise<{
 }
 
 async function signIn() {
-  console.log('[AutoTrack] popup: requesting sign-in from background');
-  const res = await chrome.runtime.sendMessage({ type: 'AUTOTRACK_SIGN_IN' });
-  console.log('[AutoTrack] popup: sign-in response', res);
+  console.log('[ApplyLog] popup: requesting sign-in from background');
+  const res = await chrome.runtime.sendMessage({ type: 'APPLYLOG_SIGN_IN' });
+  console.log('[ApplyLog] popup: sign-in response', res);
 
   if (res?.ok) {
     showSignedIn(res.email);
   } else {
-    console.error('[AutoTrack] popup: sign-in failed:', res?.error);
+    console.error('[ApplyLog] popup: sign-in failed:', res?.error);
   }
 }
 
 async function signOut() {
-  await chrome.runtime.sendMessage({ type: 'AUTOTRACK_SIGN_OUT' });
+  await chrome.runtime.sendMessage({ type: 'APPLYLOG_SIGN_OUT' });
   showSignedOut();
 }
 

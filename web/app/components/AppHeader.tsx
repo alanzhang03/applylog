@@ -8,7 +8,7 @@ export default function AppHeader() {
       <div className={styles.inner}>
         <nav className={styles.nav}>
           <Link href='/dashboard' className={styles.wordmark}>
-            AutoTrack
+            ApplyLog
           </Link>
           <Link href='/resume' className={styles.navLink}>
             Resume
