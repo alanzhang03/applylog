@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import styles from './login.module.scss';
 
@@ -16,6 +17,9 @@ export default function LoginPage() {
 
   return (
     <div className={styles.page}>
+      <Link href='/' className={styles.back}>
+        ← Back to home
+      </Link>
       <div className={styles.card}>
         <h1 className={styles.title}>ApplyLog</h1>
         <p className={styles.subtitle}>Sign in to see your job applications</p>

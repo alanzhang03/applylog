@@ -1,9 +1,24 @@
 .page {
+  position: relative;
   min-height: 100vh;
   background: #fafafa;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.back {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #a1a1aa;
+  text-decoration: none;
+
+  &:hover {
+    color: #3f3f46;
+  }
 }
 
 .card {
