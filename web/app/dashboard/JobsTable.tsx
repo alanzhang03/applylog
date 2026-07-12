@@ -1,11 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import StatusSelect from '@/app/components/StatusSelect';
 import DeleteJobButton from '@/app/components/DeleteJobButton';
 import styles from './page.module.scss';
+import { supabase } from '@/lib/supabase';
 
 function stripHtml(html: string): string {
   return html
@@ -41,38 +41,62 @@ const STATUSES = [
   'rejected',
 ] as const;
 
-export default function JobsTable({ jobs }: { jobs: Job[] }) {
-  const router = useRouter();
+export default function JobsTable({ jobs: initialJobs }: { jobs: Job[] }) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
-  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+  const [jobs, setJobs] = useState(initialJobs);
 
-  const visibleJobs = useMemo(
-    () => jobs.filter((job) => !deletedIds.has(job.id)),
-    [jobs, deletedIds],
-  );
+  useEffect(() => {
+    const channel = supabase
+      .channel('realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'jobs' },
+        (payload) => {
+          setJobs((current) => {
+            if (payload.eventType === 'INSERT') {
+              const newJob = payload.new as Job;
+              if (current.some((job) => job.id === newJob.id)) {
+                return current;
+              }
+              return [newJob, ...current];
+            } else if (payload.eventType === 'UPDATE') {
+              const updatedJob = payload.new as Job;
+              return current.map((job) =>
+                job.id === updatedJob.id ? updatedJob : job,
+              );
+            } else if (payload.eventType === 'DELETE') {
+              const removeId = (payload.old as { id: string }).id;
+              return current.filter((job) => job.id !== removeId);
+            } else {
+              return current;
+            }
+          });
+        },
+      )
+      .subscribe();
 
-  function handleDeleted(id: string) {
-    setDeletedIds((prev) => new Set(prev).add(id));
-    router.refresh();
-  }
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const providers = useMemo(
-    () => [...new Set(visibleJobs.map((job) => job.provider))].sort(),
-    [visibleJobs],
+    () => [...new Set(jobs.map((job) => job.provider))].sort(),
+    [jobs],
   );
 
   const counts = useMemo(() => {
     const map: Record<string, number> = {};
     for (const status of STATUSES) map[status] = 0;
-    for (const job of visibleJobs) map[job.status] = (map[job.status] ?? 0) + 1;
+    for (const job of jobs) map[job.status] = (map[job.status] ?? 0) + 1;
     return map;
-  }, [visibleJobs]);
+  }, [jobs]);
 
   const filteredJobs = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return visibleJobs.filter((job) => {
+    return jobs.filter((job) => {
       if (statusFilter !== 'all' && job.status !== statusFilter) return false;
       if (sourceFilter !== 'all' && job.provider !== sourceFilter) return false;
       if (
@@ -84,9 +108,9 @@ export default function JobsTable({ jobs }: { jobs: Job[] }) {
       }
       return true;
     });
-  }, [visibleJobs, search, statusFilter, sourceFilter]);
+  }, [jobs, search, statusFilter, sourceFilter]);
 
-  if (!visibleJobs.length) {
+  if (!jobs.length) {
     return (
       <div className={styles.onboarding}>
         <h2 className={styles.onboardingTitle}>No jobs yet</h2>
@@ -229,11 +253,7 @@ export default function JobsTable({ jobs }: { jobs: Job[] }) {
                       >
                         View →
                       </a>
-                      <DeleteJobButton
-                        id={job.id}
-                        className={styles.deleteButton}
-                        onDeleted={() => handleDeleted(job.id)}
-                      >
+                      <DeleteJobButton id={job.id} className={styles.deleteButton}>
                         Delete
                       </DeleteJobButton>
                     </div>
