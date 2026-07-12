@@ -2,26 +2,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { extractCompany } from '@/lib/gmail';
 import styles from './GmailSync.module.scss';
 
 const POLL_INTERVAL_MS = 4 * 60 * 1000;
-
-function extractCompany(subject: string): string | null {
-  const patterns = [
-    /applying to ([^!,\.]+)/i,
-    /application to ([^!,\.]+)/i,
-    /applying at ([^!,\.]+)/i,
-    /applied at ([^!,\.]+)/i,
-    /sent to ([^!,\.]+)/i,
-    /viewed by ([^!,\.]+)/i,
-    /^([^–\-]+)\s*[–\-]/,
-  ];
-  for (const pattern of patterns) {
-    const match = subject.match(pattern);
-    if (match) return match[1].trim();
-  }
-  return null;
-}
 
 export default function GmailSync() {
   const router = useRouter();
