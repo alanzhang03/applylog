@@ -1,5 +1,30 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+export function extractRole(subject: string) {
+  const stop = String.raw`(?=\s+(?:position|role)\b|\s+at\s|[!,.]|$)`;
+  const phrases = [
+    'applying for the',
+    'appl(?:y|ying|ied) to the',
+    'time to apply for the',
+    'application for the',
+    'applied for the',
+    'interest in the',
+    'invitation to interview for the',
+    'interview for the',
+    'offer for the',
+  ];
+  const patterns = phrases.map((p) => new RegExp(`${p} (.+?)${stop}`, 'i'));
+  patterns.push(/for the position of (.+?)(?=\s+at\s|[!,.]|$)/i);
+  patterns.push(/regarding your (.+?) application/i);
+  patterns.push(/update on your (.+?) application/i);
+
+  for (const pattern of patterns) {
+    const match = subject.match(pattern);
+    if (match) return match[1].trim();
+  }
+  return null;
+}
+
 export function extractCompany(subject: string): string | null {
   const patterns = [
     /applying to ([^!,\.]+)/i,
@@ -13,6 +38,36 @@ export function extractCompany(subject: string): string | null {
   for (const pattern of patterns) {
     const match = subject.match(pattern);
     if (match) return match[1].trim();
+  }
+  return null;
+}
+
+export function detectStatus(
+  subject: string,
+): 'rejected' | 'offer' | 'interview' | 'applied' | null {
+  if (
+    /unfortunately|not been selected|will not be moving forward|decided not to move forward|moving forward with other candidates|pursue other candidates/i.test(
+      subject,
+    )
+  ) {
+    return 'rejected';
+  }
+  if (/\boffer\b|excited to extend|pleased to offer/i.test(subject)) {
+    return 'offer';
+  }
+  if (
+    /invitation to interview|interview invitation|schedule.{0,20}interview|request for (?:an? )?interview/i.test(
+      subject,
+    )
+  ) {
+    return 'interview';
+  }
+  if (
+    /your application|application received|thank you for applying|we received your application/i.test(
+      subject,
+    )
+  ) {
+    return 'applied';
   }
   return null;
 }
