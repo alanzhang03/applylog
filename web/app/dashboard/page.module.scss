@@ -11,7 +11,7 @@ $zinc-900: #18181b;
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1450px;
   margin: 0 auto;
   padding: 40px 24px;
 }
@@ -329,7 +329,9 @@ $zinc-900: #18181b;
   padding: 6px 14px;
   cursor: pointer;
   font-family: inherit;
-  transition: border-color 0.1s, box-shadow 0.1s;
+  transition:
+    border-color 0.1s,
+    box-shadow 0.1s;
 
   &:hover {
     border-color: $zinc-400;
@@ -340,12 +342,21 @@ $zinc-900: #18181b;
     box-shadow: 0 0 0 1px $zinc-900;
   }
 
-  &.saved .statValue { color: #71717a; }
-  &.applied .statValue { color: #1d4ed8; }
-  &.screen .statValue { color: #a16207; }
-  &.interview .statValue { color: #7e22ce; }
-  &.offer .statValue { color: #15803d; }
-  &.rejected .statValue { color: #b91c1c; }
+  &.saved .statValue {
+    color: #71717a;
+  }
+  &.applied .statValue {
+    color: #1d4ed8;
+  }
+  &.interview .statValue {
+    color: #7e22ce;
+  }
+  &.offer .statValue {
+    color: #15803d;
+  }
+  &.rejected .statValue {
+    color: #b91c1c;
+  }
 }
 
 .statValue {
@@ -403,5 +414,40 @@ $zinc-900: #18181b;
   &:focus {
     outline: none;
     border-color: $zinc-400;
+  }
+}
+
+.viewToggle {
+  display: flex;
+  border: 1px solid $zinc-200;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.viewToggleButton {
+  border: none;
+  background: white;
+  color: $zinc-400;
+  font-size: 0.875rem;
+  font-family: inherit;
+  font-weight: 500;
+  padding: 9px 16px;
+  cursor: pointer;
+  transition:
+    background 0.1s,
+    color 0.1s;
+
+  &:not(:last-child) {
+    border-right: 1px solid $zinc-200;
+  }
+
+  &:hover {
+    color: $zinc-600;
+  }
+
+  &.viewToggleActive {
+    background: $zinc-900;
+    color: white;
   }
 }
