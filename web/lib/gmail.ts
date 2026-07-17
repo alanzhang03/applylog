@@ -1,5 +1,30 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+export function extractRole(subject: string) {
+  const stop = String.raw`(?=\s+(?:position|role)\b|\s+at\s|[!,.]|$)`;
+  const phrases = [
+    'applying for the',
+    'appl(?:y|ying|ied) to the',
+    'time to apply for the',
+    'application for the',
+    'applied for the',
+    'interest in the',
+    'invitation to interview for the',
+    'interview for the',
+    'offer for the',
+  ];
+  const patterns = phrases.map((p) => new RegExp(`${p} (.+?)${stop}`, 'i'));
+  patterns.push(/for the position of (.+?)(?=\s+at\s|[!,.]|$)/i);
+  patterns.push(/regarding your (.+?) application/i);
+  patterns.push(/update on your (.+?) application/i);
+
+  for (const pattern of patterns) {
+    const match = subject.match(pattern);
+    if (match) return match[1].trim();
+  }
+  return null;
+}
+
 export function extractCompany(subject: string): string | null {
   const patterns = [
     /applying to ([^!,\.]+)/i,
@@ -13,6 +38,36 @@ export function extractCompany(subject: string): string | null {
   for (const pattern of patterns) {
     const match = subject.match(pattern);
     if (match) return match[1].trim();
+  }
+  return null;
+}
+
+export function detectStatus(
+  subject: string,
+): 'rejected' | 'offer' | 'interview' | 'applied' | null {
+  if (
+    /unfortunately|not been selected|will not be moving forward|decided not to move forward|moving forward with other candidates|pursue other candidates/i.test(
+      subject,
+    )
+  ) {
+    return 'rejected';
+  }
+  if (/\boffer\b|excited to extend|pleased to offer/i.test(subject)) {
+    return 'offer';
+  }
+  if (
+    /invitation to interview|interview invitation|schedule.{0,20}interview|request for (?:an? )?interview/i.test(
+      subject,
+    )
+  ) {
+    return 'interview';
+  }
+  if (
+    /your application|application received|thank you for applying|we received your application/i.test(
+      subject,
+    )
+  ) {
+    return 'applied';
   }
   return null;
 }
@@ -39,7 +94,7 @@ export async function syncGmailForUser(
     .toISOString()
     .slice(0, 10)
     .replace(/-/g, '/');
-  const query = `after:${after_date} subject:("your application" OR "application received" OR "thank you for applying" OR "we received your application")`;
+  const query = `after:${after_date} subject:("your application" OR "application received" OR "thank you for applying" OR "we received your application" OR "unfortunately" OR "not been selected" OR "moving forward with other candidates" OR "interview" OR "offer")`;
 
   const listRes = await fetch(
     `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(query)}&maxResults=25`,
@@ -61,18 +116,64 @@ export async function syncGmailForUser(
     if (subject) subjects.push(subject);
   }
 
-  const companies = [
-    ...new Set(subjects.map(extractCompany).filter(Boolean) as string[]),
-  ];
+  type Extracted = {
+    company: string;
+    role: string | null;
+    status: 'rejected' | 'offer' | 'interview' | 'applied';
+  };
 
-  const { data: matchedJobs } = await supabase
+  const extracted: Extracted[] = [];
+  for (const subject of subjects) {
+    const company = extractCompany(subject);
+    const status = detectStatus(subject);
+    if (!company || !status) continue;
+    extracted.push({ company, role: extractRole(subject), status });
+  }
+
+  if (extracted.length === 0) return;
+
+  const companies = [...new Set(extracted.map((e) => e.company))];
+
+  const { data: jobs } = await supabase
     .from('jobs')
-    .select('id, company')
+    .select('id, company, title, status')
     .eq('user_id', userId)
     .in('company', companies);
 
-  if (matchedJobs && matchedJobs.length > 0) {
-    const ids = matchedJobs.map((j) => j.id);
-    await supabase.from('jobs').update({ status: 'applied' }).in('id', ids);
+  if (!jobs || jobs.length === 0) return;
+
+  const STAGE_RANK: Record<string, number> = {
+    saved: 0,
+    applied: 1,
+    screen: 2,
+    interview: 3,
+    offer: 4,
+  };
+
+  for (const { company, role, status } of extracted) {
+    const candidates = jobs.filter(
+      (j) => j.company === company && j.status !== 'rejected',
+    );
+
+    let target = role
+      ? candidates.filter(
+          (j) =>
+            j.title &&
+            (j.title.toLowerCase().includes(role.toLowerCase()) ||
+              role.toLowerCase().includes(j.title.toLowerCase())),
+        )
+      : [];
+    if (target.length !== 1) {
+      target = candidates.length === 1 ? candidates : [];
+    }
+    if (target.length !== 1) continue;
+
+    const [job] = target;
+    const isRejection = status === 'rejected';
+    const isForward = STAGE_RANK[status] > (STAGE_RANK[job.status] ?? 0);
+    if (!isRejection && !isForward) continue;
+
+    await supabase.from('jobs').update({ status }).eq('id', job.id);
+    job.status = status;
   }
 }
