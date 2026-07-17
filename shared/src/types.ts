@@ -3,7 +3,6 @@ export type ATSProvider = 'greenhouse' | 'lever' | 'ashby' | 'workday';
 export type ApplicationStatus =
   | 'saved'
   | 'applied'
-  | 'screen'
   | 'interview'
   | 'offer'
   | 'rejected';

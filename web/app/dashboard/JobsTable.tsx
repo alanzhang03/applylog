@@ -4,17 +4,20 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import StatusSelect from '@/app/components/StatusSelect';
 import DeleteJobButton from '@/app/components/DeleteJobButton';
+import JobsBoard from './JobsBoard';
 import styles from './page.module.scss';
 import { supabase } from '@/lib/supabase';
 
-function stripHtml(html: string): string {
+export function stripHtml(html: string): string {
   return html
     .replace(/<[^>]*>/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
-function matchTier(score: number): 'matchHigh' | 'matchMedium' | 'matchLow' {
+export function matchTier(
+  score: number,
+): 'matchHigh' | 'matchMedium' | 'matchLow' {
   if (score >= 0.7) return 'matchHigh';
   if (score >= 0.4) return 'matchMedium';
   return 'matchLow';
@@ -32,10 +35,9 @@ export type Job = {
   match_score: number | null;
 };
 
-const STATUSES = [
+export const STATUSES = [
   'saved',
   'applied',
-  'screen',
   'interview',
   'offer',
   'rejected',
@@ -45,6 +47,7 @@ export default function JobsTable({ jobs: initialJobs }: { jobs: Job[] }) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
+  const [view, setView] = useState<'table' | 'board'>('table');
   const [jobs, setJobs] = useState(initialJobs);
 
   useEffect(() => {
@@ -94,10 +97,9 @@ export default function JobsTable({ jobs: initialJobs }: { jobs: Job[] }) {
     return map;
   }, [jobs]);
 
-  const filteredJobs = useMemo(() => {
+  const searchFiltered = useMemo(() => {
     const query = search.trim().toLowerCase();
     return jobs.filter((job) => {
-      if (statusFilter !== 'all' && job.status !== statusFilter) return false;
       if (sourceFilter !== 'all' && job.provider !== sourceFilter) return false;
       if (
         query &&
@@ -108,7 +110,22 @@ export default function JobsTable({ jobs: initialJobs }: { jobs: Job[] }) {
       }
       return true;
     });
-  }, [jobs, search, statusFilter, sourceFilter]);
+  }, [jobs, search, sourceFilter]);
+
+  const filteredJobs = useMemo(
+    () =>
+      statusFilter === 'all'
+        ? searchFiltered
+        : searchFiltered.filter((job) => job.status === statusFilter),
+    [searchFiltered, statusFilter],
+  );
+
+  async function handleStatusChange(jobId: string, status: string) {
+    setJobs((current) =>
+      current.map((job) => (job.id === jobId ? { ...job, status } : job)),
+    );
+    await supabase.from('jobs').update({ status }).eq('id', jobId);
+  }
 
   if (!jobs.length) {
     return (
@@ -175,9 +192,25 @@ export default function JobsTable({ jobs: initialJobs }: { jobs: Job[] }) {
             </option>
           ))}
         </select>
+        <div className={styles.viewToggle}>
+          <button
+            className={`${styles.viewToggleButton} ${view === 'table' ? styles.viewToggleActive : ''}`}
+            onClick={() => setView('table')}
+          >
+            Table
+          </button>
+          <button
+            className={`${styles.viewToggleButton} ${view === 'board' ? styles.viewToggleActive : ''}`}
+            onClick={() => setView('board')}
+          >
+            Board
+          </button>
+        </div>
       </div>
 
-      {!filteredJobs.length ? (
+      {view === 'board' ? (
+        <JobsBoard jobs={searchFiltered} onStatusChange={handleStatusChange} />
+      ) : !filteredJobs.length ? (
         <div className={styles.empty}>No jobs match your filters.</div>
       ) : (
         <div className={styles.tableWrapper}>

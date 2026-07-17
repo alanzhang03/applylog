@@ -33,7 +33,7 @@ const features = [
   {
     title: 'Status tracking',
     description:
-      'Move jobs through saved → applied → screen → interview → offer as your pipeline progresses.',
+      'Move jobs through saved → applied → interview → offer as your pipeline progresses.',
   },
   {
     title: 'Resume match scoring',
@@ -70,7 +70,7 @@ const previewJobs = [
   {
     company: 'Notion',
     title: 'Product Engineer',
-    status: 'screen',
+    status: 'interview',
     provider: 'ashby',
     match: 0.52,
   },

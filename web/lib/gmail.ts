@@ -145,9 +145,8 @@ export async function syncGmailForUser(
   const STAGE_RANK: Record<string, number> = {
     saved: 0,
     applied: 1,
-    screen: 2,
-    interview: 3,
-    offer: 4,
+    interview: 2,
+    offer: 3,
   };
 
   for (const { company, role, status } of extracted) {

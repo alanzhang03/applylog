@@ -1,0 +1,164 @@
+$zinc-50: #fafafa;
+$zinc-100: #f4f4f5;
+$zinc-200: #e4e4e7;
+$zinc-400: #a1a1aa;
+$zinc-600: #52525b;
+$zinc-900: #18181b;
+
+.board {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: $zinc-200 transparent;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $zinc-200;
+    border-radius: 999px;
+
+    &:hover {
+      background: $zinc-400;
+    }
+  }
+}
+
+.column {
+  flex: 0 0 260px;
+  min-width: 0;
+  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  background: $zinc-50;
+  border: 1px solid $zinc-200;
+  border-radius: 12px;
+  max-height: calc(100vh - 320px);
+  transition: border-color 0.1s, background 0.1s;
+}
+
+.columnDragOver {
+  border-color: $zinc-900;
+  background: $zinc-100;
+}
+
+.columnHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid $zinc-200;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: $zinc-600;
+
+  &.saved { color: #71717a; }
+  &.applied { color: #1d4ed8; }
+  &.interview { color: #7e22ce; }
+  &.offer { color: #15803d; }
+  &.rejected { color: #b91c1c; }
+}
+
+.columnTitle {
+  letter-spacing: 0.02em;
+}
+
+.columnCount {
+  color: $zinc-400;
+  font-weight: 500;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.card {
+  background: white;
+  border: 1px solid $zinc-200;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: grab;
+  transition: opacity 0.1s, box-shadow 0.1s;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.cardDragging {
+  opacity: 0.4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.cardLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.cardCompany {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: $zinc-900;
+  text-transform: capitalize;
+}
+
+.cardTitle {
+  font-size: 0.75rem;
+  color: $zinc-600;
+  margin-top: 2px;
+}
+
+.cardMeta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  a {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: $zinc-400;
+    text-decoration: none;
+    transition: color 0.1s;
+
+    &:hover {
+      color: $zinc-900;
+    }
+  }
+}
+
+.emptyColumn {
+  font-size: 0.75rem;
+  color: $zinc-400;
+  text-align: center;
+  padding: 16px 0;
+}
