@@ -13,6 +13,9 @@ export default function AppHeader() {
           <Link href='/resume' className={styles.navLink}>
             Resume
           </Link>
+          <Link href='/analytics' className={styles.navLink}>
+            Analytics
+          </Link>
         </nav>
         <LogoutButton />
       </div>
